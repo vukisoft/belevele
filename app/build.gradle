@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "hu.vuk.belevele"
         minSdkVersion 9
-        targetSdkVersion 19
+        targetSdkVersion 25
         jackOptions {
             enabled true
         }
@@ -28,4 +28,6 @@ android {
 dependencies {
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.google.guava:guava:20.0'
+    /* compile 'org.inferred:freebuilder:1.12' */
+    /* compile fileTree(include: ['*.jar'], dir: 'build/libs') */
 }

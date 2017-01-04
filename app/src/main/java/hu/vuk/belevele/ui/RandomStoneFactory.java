@@ -8,9 +8,7 @@ import hu.vuk.belevele.game.stone.Shape;
 import hu.vuk.belevele.game.stone.Stone;
 
 /**
- * Creates a random stone.
- *
- * @author Marton Dinnyes
+ * Creates a random shape/color stone.
  */
 public class RandomStoneFactory implements StoneFactory {
   private static final Random RND = new Random();

@@ -131,7 +131,7 @@ public class BoardView extends BitmapGridView {
   public Set<Stone> setPossibilities(Set<Stone> nexts) {
     next = null;
 
-    Set<Stone> ret = new HashSet<Stone>(nexts.size());
+    Set<Stone> ret = new HashSet<>(nexts.size());
     possiblePlaces = new HashSet<>();
     for (Stone stone : nexts) {
       boolean placeable = true;
