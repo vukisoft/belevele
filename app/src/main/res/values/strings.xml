@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">belevele</string>
+    <string name="new_game_button">New game</string>
+    <string name="scoreText">Score: %1$d\nMultiplier: %2$d</string>
+</resources>
