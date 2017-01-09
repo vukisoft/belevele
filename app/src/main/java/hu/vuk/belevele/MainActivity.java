@@ -2,17 +2,14 @@ package hu.vuk.belevele;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Set;
-
-import hu.vuk.belevele.game.stone.Stone;
+import hu.vuk.belevele.game.board.Board;
+import hu.vuk.belevele.game.board.Game;
+import hu.vuk.belevele.game.board.NextStones;
 import hu.vuk.belevele.ui.BoardListener;
 import hu.vuk.belevele.ui.BoardView;
-import hu.vuk.belevele.ui.NextStoneListener;
 import hu.vuk.belevele.ui.NextStoneView;
 import hu.vuk.belevele.ui.RandomStoneFactory;
 import hu.vuk.belevele.ui.StoneResourceService;
@@ -20,10 +17,13 @@ import hu.vuk.belevele.ui.StoneResourceService;
 public class MainActivity extends Activity {
 
   private static final int NEXT_COUNT = 3;
+  private static final int BOARD_SIZE = 8;
+
+  private Game game;
 
   private final StoneResourceService stoneResourceService = new StoneResourceService();
   private NextStoneView nextView;
-  private BoardView board;
+  private BoardView boardView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -34,50 +34,58 @@ public class MainActivity extends Activity {
   }
 
   private void initialize() {
-    nextView = (NextStoneView) findViewById(R.id.nextView);
-    nextView.setStonesCount(NEXT_COUNT);
-    nextView.setStoneResourceService(stoneResourceService);
-    nextView.setStoneFactory(new RandomStoneFactory());
-    nextView.initialize();
+    game = getLastGame();
 
-    board = (BoardView) findViewById(R.id.boardView);
-    board.setStoneResourceService(stoneResourceService);
-    board.initialize();
+    nextView = (NextStoneView) findViewById(R.id.nextView);
+    nextView.setStoneResourceService(stoneResourceService);
+
+    boardView = (BoardView) findViewById(R.id.boardView);
+    boardView.setStoneResourceService(stoneResourceService);
 
     final TextView scoreText = (TextView) findViewById(R.id.scoreTextView);
-    board.setBoardListener(new BoardListener() {
-
+    boardView.setBoardListener(new BoardListener() {
       @Override
       public void onScoreChanged(int score, int multiplier) {
         scoreText.setText(getResources().getString(R.string.scoreText, score, multiplier));
-        nextStone();
+        nextView.invalidate();
       }
     });
-    nextView.setNextStoneListener(stone -> board.setNext(stone));
+
+    nextView.setNextStoneListener(stone -> {
+      boardView.invalidate();
+      nextView.invalidate();
+    });
+
+    setGameToViews();
 
     Button button = (Button) findViewById(R.id.newGameButton);
     button.setOnClickListener(v -> {
-        nextView.reset();
-        board.newGame();
-      });
-
-    updateNextStones();
+      game = createNewGame();
+      setGameToViews();
+    });
   }
 
-  private void nextStone() {
-    nextView.nextStone();
-    updateNextStones();
+  private void setGameToViews() {
+    nextView.setNextStones(game.getNextStones());
+    boardView.setGame(game);
   }
 
-  void updateNextStones() {
-    Set<Stone> usableStones = board.setPossibilities(nextView.getStones());
-    nextView.setAvailabe(usableStones);
+  @Override
+  public Object onRetainNonConfigurationInstance() {
+    return game;
+  }
 
-    if (usableStones.isEmpty()) {
-      // it's over, mate
-      board.setOver();
-    } else {
-      board.setNext(nextView.getSelected());
+  private Game getLastGame() {
+    Game game = (Game) getLastNonConfigurationInstance();
+    if (game == null) {
+      game = createNewGame();
     }
+    return game;
+  }
+
+  private Game createNewGame() {
+    return new Game(
+        new Board(BOARD_SIZE, BOARD_SIZE),
+        new NextStones(NEXT_COUNT, new RandomStoneFactory()));
   }
 }

@@ -33,6 +33,9 @@ public class BitmapGridView extends View {
 
   @Override
   protected void onDraw(Canvas canvas) {
+    if (bitmapProvider == null) {
+      return;
+    }
     int cwidth = canvas.getWidth();
     int cheight = canvas.getHeight();
     int visibleWidth = cwidth / width;
@@ -81,6 +84,10 @@ public class BitmapGridView extends View {
 
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    if (width == 0 || height == 0) {
+      return;
+    }
+
     int originalWidth = MeasureSpec.getSize(widthMeasureSpec);
     int originalHeight = MeasureSpec.getSize(heightMeasureSpec);
 

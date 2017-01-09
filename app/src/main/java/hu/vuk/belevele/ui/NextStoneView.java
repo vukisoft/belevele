@@ -16,26 +16,21 @@ import java.util.List;
 import java.util.Set;
 
 import hu.vuk.belevele.R;
+import hu.vuk.belevele.game.board.NextStones;
 import hu.vuk.belevele.game.board.StoneFactory;
 import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Point;
 
 public class NextStoneView extends BitmapGridView {
 
-  private StoneFactory stoneFactory;
-  private StoneResourceService stoneResourceService;
+  private NextStones nextStones;
 
   private NextStoneListener nextStoneListener = new NextStoneListener() {
     @Override
     public void onSelection(Stone stone) {
     }
   };
-
-  private List<Stone> stones = Collections.emptyList();
-  private int count;
-
-  private int selected = -1;
-  private Set<Stone> availables = Collections.emptySet();
+  private StoneResourceService stoneResourceService;
 
   public NextStoneView(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -55,9 +50,9 @@ public class NextStoneView extends BitmapGridView {
       @Override
       public void draw(int x, int y, Canvas canvas, Rect rect) {
         super.draw(x, y, canvas, rect);
-        if (!availables.contains(stones.get(x))) {
+        if (nextStones.isAvailable(x)) {
           canvas.drawRect(rect, paintDisabled);
-        } else if (count > 1 && selected == x) {
+        } else if (nextStones.getCount() > 1 && nextStones.getSelectedIndex() == x) {
           Rect clipArea = new Rect(rect);
           clipArea.top += 10;
           clipArea.left += 10;
@@ -70,7 +65,7 @@ public class NextStoneView extends BitmapGridView {
 
       @Override
       public Bitmap getBitmap(int x, int y) {
-        return stoneResourceService.getStoneResource(stones.get(x));
+        return stoneResourceService.getStoneResource(nextStones.get(x));
       }
     });
   }
@@ -83,82 +78,27 @@ public class NextStoneView extends BitmapGridView {
     return true;
   }
 
-  public void setStonesCount(int count) {
-    this.count = count;
-    setDimensions(count, 1);
-  }
-
-  public void initialize() {
-    reset();
-  }
-
-  public void reset() {
-    stones = new ArrayList<>(count);
-    for (int i = 0; i < count; i++) {
-      stones.add(stoneFactory.create());
-    }
-
-    availables = new HashSet<Stone>(stones);
+  public void setNextStones(NextStones nextStones) {
+    this.nextStones = nextStones;
+    setDimensions(nextStones.getCount(), 1);
     invalidate();
   }
 
   private void fireSelectionEvent() {
-    nextStoneListener.onSelection(getSelected());
-  }
-
-  public Set<Stone> getStones() {
-    return new HashSet<>(stones);
-  }
-
-  public Stone getSelected() {
-    return selected >= 0 ? stones.get(selected) : null;
-  }
-
-  public void setAvailabe(Set<Stone> availables) {
-    this.availables = availables;
-    if (selected == -1 || !availables.contains(getSelected())) {
-      int index = 0;
-      for (Stone stone : stones) {
-        if (availables.contains(stone)) {
-          setSelected(index);
-          break;
-        }
-        index++;
-      }
-      if (index == count) {
-        // there is no possible value
-        selected = -1;
-      }
-    }
-    invalidate();
+    nextStoneListener.onSelection(nextStones.getSelected());
   }
 
   private void setSelected(int selected) {
-    if (!availables.contains(stones.get(selected))) {
-      return;
+    if (nextStones.setSelected(selected)) {
+      fireSelectionEvent();
     }
-
-    this.selected = selected;
-    fireSelectionEvent();
-  }
-
-  public void nextStone() {
-    if (selected == -1) {
-      return;
-    }
-
-    stones.set(selected, stoneFactory.create());
-  }
-
-  public void setStoneFactory(StoneFactory stoneFactory) {
-    this.stoneFactory = stoneFactory;
-  }
-
-  public void setStoneResourceService(StoneResourceService stoneResourceService) {
-    this.stoneResourceService = stoneResourceService;
   }
 
   public void setNextStoneListener(NextStoneListener nextStoneListener) {
     this.nextStoneListener = nextStoneListener;
+  }
+
+  public void setStoneResourceService(StoneResourceService stoneResourceService) {
+    this.stoneResourceService = stoneResourceService;
   }
 }
