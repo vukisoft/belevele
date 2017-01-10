@@ -39,7 +39,7 @@ public class Board {
       return false;
     }
 
-    score += multiplier * Math.max(neighbours.size(), 1);
+    score += multiplier * neighbours.size();
 
     if (neighbours.size() == matrix.getMaxNeigbours()) {
       // we placed among 4 others

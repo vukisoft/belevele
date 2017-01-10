@@ -1,7 +1,6 @@
 package hu.vuk.belevele.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -9,19 +8,12 @@ import android.graphics.Region.Op;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import hu.vuk.belevele.R;
 import hu.vuk.belevele.game.board.NextStones;
-import hu.vuk.belevele.game.board.StoneFactory;
 import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Point;
 
-public class NextStoneView extends BitmapGridView {
+public class NextStoneView extends GridView {
 
   private NextStones nextStones;
 
@@ -35,7 +27,7 @@ public class NextStoneView extends BitmapGridView {
   public NextStoneView(Context context, AttributeSet attrs) {
     super(context, attrs);
 
-    setBitmapProvider(new DrawBitmapStrategy() {
+    setCellDrawStrategy(new BitmapCellDrawStrategy() {
       Paint paintSelection;
       Paint paintDisabled;
 
@@ -49,7 +41,14 @@ public class NextStoneView extends BitmapGridView {
 
       @Override
       public void draw(int x, int y, Canvas canvas, Rect rect) {
-        super.draw(x, y, canvas, rect);
+        drawBitmap(
+            stoneResourceService.getStoneResource(StoneResourceService.STONE),
+            255,
+            canvas, rect);
+        drawBitmap(
+            stoneResourceService.getStoneResource(nextStones.get(x)),
+            ViewSettings.STONE_TOP_ALPHA,
+            canvas, rect);
         if (nextStones.isAvailable(x)) {
           canvas.drawRect(rect, paintDisabled);
         } else if (nextStones.getCount() > 1 && nextStones.getSelectedIndex() == x) {
@@ -61,11 +60,6 @@ public class NextStoneView extends BitmapGridView {
           canvas.clipRect(clipArea, Op.XOR);
           canvas.drawRect(rect, paintSelection);
         }
-      }
-
-      @Override
-      public Bitmap getBitmap(int x, int y) {
-        return stoneResourceService.getStoneResource(nextStones.get(x));
       }
     });
   }

@@ -3,6 +3,8 @@ package hu.vuk.belevele.ui;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.google.common.base.Preconditions;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -30,38 +32,22 @@ import static hu.vuk.belevele.game.stone.Shape.STAR;
 
 public class StoneResourceService {
 
-  public static final String STONE_EMPTY = "empty.jpg";
-  public static final String STONE_POSSIBLE_MOVE = "help.jpg";
-  public static final String STONE_POSSIBLE_MOVE_ALTERNATE = "help2.jpg";
+  public static final String POSSIBLE_MOVE = "help.png";
+  public static final String POSSIBLE_MOVE_ALTERNATE = "alternate_help.png";
+  public static final String STONE = "stone.png";
 
   private static final String BASE_PACKAGE = "stones/";
-  private static final String FILE_NAME_FORMAT = "st{0}{1}.jpg";
-
-  private static final Map<Color, Object> COLOR_NAMES = new HashMap<>();
-  private static final Map<Shape, Object> SHAPE_NAMES = new HashMap<>();
-
-  static {
-    COLOR_NAMES.put(RED, 1);
-    COLOR_NAMES.put(BLUE, 2);
-    COLOR_NAMES.put(GREEN, 3);
-    COLOR_NAMES.put(MAGENTA, 4);
-    COLOR_NAMES.put(GRAY, 5);
-    COLOR_NAMES.put(YELLOW, 6);
-
-    SHAPE_NAMES.put(SQUARE, 1);
-    SHAPE_NAMES.put(DROP, 2);
-    SHAPE_NAMES.put(CROSS, 3);
-    SHAPE_NAMES.put(STAR, 4);
-  }
+  private static final String FILE_NAME_FORMAT = "{0}_{1}.png";
 
   private ConcurrentMap<String, FutureTask<Bitmap>> cache = new ConcurrentHashMap<>();
 
   private String getStoneName(Stone stone) {
-    if (stone == null) {
-      return STONE_EMPTY;
-    }
+    Preconditions.checkArgument(stone != null);
 
-    return MessageFormat.format(FILE_NAME_FORMAT, COLOR_NAMES.get(stone.getColor()), SHAPE_NAMES.get(stone.getShape()));
+    return MessageFormat.format(
+        FILE_NAME_FORMAT,
+        stone.getShape().name().toLowerCase(),
+        stone.getColor().name().toLowerCase());
   }
 
   private String getStonePath(String name) {
