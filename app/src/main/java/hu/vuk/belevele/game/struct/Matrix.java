@@ -1,6 +1,7 @@
 package hu.vuk.belevele.game.struct;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -10,9 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class Matrix<T> {
+import static com.google.common.base.Predicates.notNull;
 
-  private static final int MAX_NEIGBOURS = 4;
+public abstract class Matrix<T> {
 
   private T[][] data;
   private int width;
@@ -25,16 +26,16 @@ public class Matrix<T> {
     this.data = (T[][]) Array.newInstance(type, width, height);
   }
 
+  public abstract boolean isOutOfBounds(int x, int y);
+  public abstract int getMaxNeighbours();
+  protected abstract Iterable<Point> getAllNeighbourPoints(int x, int y);
+
   public T get(int x, int y) {
     if (isOutOfBounds(x, y)) {
       return null;
     }
 
     return data[x][y];
-  }
-
-  public boolean isOutOfBounds(int x, int y) {
-    return x < 0 || y < 0 || x >= width || y >= height;
   }
 
   public void set(int x, int y, T o) {
@@ -46,10 +47,10 @@ public class Matrix<T> {
   }
 
   public Collection<T> getAll(Predicate<T> predicate) {
-
     List<T> ret = new LinkedList<>();
-    for (T[] a : data) {
-      for (T o : a) {
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        T o = get(x, y);
         if (o != null && predicate.apply(o)) {
           ret.add(o);
         }
@@ -63,6 +64,9 @@ public class Matrix<T> {
     Set<Point> ret = new HashSet<>();
     for (int x = 0; x < width; x++) {
       for (int y = 0; y < height; y++) {
+        if (isOutOfBounds(x, y)) {
+          continue;
+        }
         T o = get(x, y);
         if (criteria == null || criteria.apply(o, x, y)) {
           ret.add(new Point(x, y));
@@ -74,34 +78,16 @@ public class Matrix<T> {
   }
 
   public Collection<T> getNeighbours(int x, int y) {
-    List<T> ret = new ArrayList<>(4);
-    addIfNotNull(ret, x - 1, y);
-    addIfNotNull(ret, x + 1, y);
-    addIfNotNull(ret, x, y - 1);
-    addIfNotNull(ret, x, y + 1);
-    return ret;
+    return FluentIterable.from(getNeighbourPoints(x, y))
+        .transform(point -> get(point.getX(), point.getY()))
+        .filter(notNull())
+        .toList();
   }
 
   public Collection<Point> getNeighbourPoints(int x, int y) {
-    List<Point> ret = new ArrayList<>(4);
-    addIfIn(ret, x - 1, y);
-    addIfIn(ret, x + 1, y);
-    addIfIn(ret, x, y - 1);
-    addIfIn(ret, x, y + 1);
-    return ret;
-  }
-
-  private void addIfIn(List<Point> ret, int x, int y) {
-    if (!isOutOfBounds(x, y)) {
-      ret.add(new Point(x, y));
-    }
-  }
-
-  private void addIfNotNull(Collection<T> ret, int x, int y) {
-    T o = get(x, y);
-    if (o != null) {
-      ret.add(o);
-    }
+    return FluentIterable.from(getAllNeighbourPoints(x, y))
+        .filter(point -> !isOutOfBounds(point.getX(), point.getY()))
+        .toList();
   }
 
   public int getWidth() {
@@ -115,12 +101,8 @@ public class Matrix<T> {
   public void clear() {
     for (int x = 0; x < width; x++) {
       for (int y = 0; y < width; y++) {
-        set(x, y, null);
+        data[x][y] = null;
       }
     }
-  }
-
-  public int getMaxNeigbours() {
-    return MAX_NEIGBOURS;
   }
 }

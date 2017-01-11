@@ -33,9 +33,11 @@ public class BoardView extends GridView {
   private StoneResourceService stoneResourceService;
   private BackgroundTiles backgroundTiles;
 
-  private Paint paintDarkOverlay;
-
   private BoardListener boardListener = NOTHING;
+
+  public BoardView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+  }
 
   @Override
   public void drawCell(int x, int y, Canvas canvas, Rect rect) {
@@ -68,12 +70,6 @@ public class BoardView extends GridView {
     }
   }
 
-  public BoardView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    paintDarkOverlay = new Paint();
-    paintDarkOverlay.setColor(ContextCompat.getColor(context, R.color.black_overlay));
-  }
-
   private void fireScoreEvent() {
     // TODO make game keep the score
     boardListener.onScoreChanged(game.getBoard().getScore(), game.getBoard().getMultiplier());
@@ -88,6 +84,8 @@ public class BoardView extends GridView {
 
   private void drawDropShadowIfNeeded(Canvas canvas) {
     if (game.isOver()) {
+      Paint paintDarkOverlay = new Paint();
+      paintDarkOverlay.setColor(ContextCompat.getColor(getContext(), R.color.black_overlay));
       canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paintDarkOverlay);
     }
   }

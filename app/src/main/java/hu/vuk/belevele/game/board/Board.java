@@ -7,6 +7,8 @@ import java.util.Set;
 
 import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Matrix;
+import hu.vuk.belevele.game.struct.Matrix4;
+import hu.vuk.belevele.game.struct.Matrix6;
 import hu.vuk.belevele.game.struct.Point;
 
 public class Board {
@@ -17,13 +19,7 @@ public class Board {
   private int multiplier = 1;
 
   public Board(int width, int height) {
-    matrix = new Matrix<>(width, height, Stone.class);
-  }
-
-  public final void newGame() {
-    matrix.clear();
-    score = 0;
-    multiplier = 1;
+    matrix = new Matrix4<>(width, height, Stone.class);
   }
 
   /**
@@ -41,8 +37,7 @@ public class Board {
 
     score += multiplier * neighbours.size();
 
-    if (neighbours.size() == matrix.getMaxNeigbours()) {
-      // we placed among 4 others
+    if (neighbours.size() == matrix.getMaxNeighbours()) {
       multiplier++;
     }
 
