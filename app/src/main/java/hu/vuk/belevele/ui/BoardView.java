@@ -21,6 +21,9 @@ import hu.vuk.belevele.game.board.Game;
 import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Point;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static hu.vuk.belevele.ui.DrawHelpers.drawBitmap;
+
 public class BoardView extends GridView {
 
   private static final BoardListener NOTHING = (score, multiplier) -> {};
@@ -34,38 +37,36 @@ public class BoardView extends GridView {
 
   private BoardListener boardListener = NOTHING;
 
-  private CellDrawStrategy cellDrawStrategy = new BitmapCellDrawStrategy() {
-    @Override
-    public void draw(int x, int y, Canvas canvas, Rect rect) {
-      Stone stone = game.getBoard().get(x, y);
-      if (stone == null) {
-        backgroundTiles.draw(x, y, canvas, rect);
-      } else {
-        drawBitmap(
-            stoneResourceService.getStoneResource(StoneResourceService.STONE),
-            255,
-            canvas, rect);
-        drawBitmap(
-            stoneResourceService.getStoneResource(stone),
-            ViewSettings.STONE_TOP_ALPHA,
-            canvas, rect);
-      }
-
-      Point point = new Point(x, y);
-      if (game.isHighlightedPlaceForSelected(point)) {
-        drawBitmap(
-            stoneResourceService.getStoneResource(StoneResourceService.POSSIBLE_MOVE),
-            200,
-            canvas, rect);
-      } else if (game.isHighlightedPlace(point)) {
-        drawBitmap(
-            stoneResourceService.getStoneResource(
-                StoneResourceService.POSSIBLE_MOVE_ALTERNATE),
-            200,
-            canvas, rect);
-      }
+  @Override
+  public void drawCell(int x, int y, Canvas canvas, Rect rect) {
+    Stone stone = game.getBoard().get(x, y);
+    if (stone == null) {
+      backgroundTiles.draw(x, y, canvas, rect);
+    } else {
+      drawBitmap(
+          stoneResourceService.getStoneResource(StoneResourceService.STONE),
+          255,
+          canvas, rect);
+      drawBitmap(
+          stoneResourceService.getStoneResource(stone),
+          ViewSettings.STONE_TOP_ALPHA,
+          canvas, rect);
     }
-  };
+
+    Point point = new Point(x, y);
+    if (game.isHighlightedPlaceForSelected(point)) {
+      drawBitmap(
+          stoneResourceService.getStoneResource(StoneResourceService.POSSIBLE_MOVE),
+          200,
+          canvas, rect);
+    } else if (game.isHighlightedPlace(point)) {
+      drawBitmap(
+          stoneResourceService.getStoneResource(
+              StoneResourceService.POSSIBLE_MOVE_ALTERNATE),
+          200,
+          canvas, rect);
+    }
+  }
 
   public BoardView(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -129,16 +130,10 @@ public class BoardView extends GridView {
 
   // TODO set board only
   public void setGame(Game game) {
-    this.game = game;
+    this.game = checkNotNull(game);
 
-    if (game != null) {
-      if (setDimensions(game.getBoard().getWidth(), game.getBoard().getHeight())) {
-        backgroundTiles = new BackgroundTiles(game.getBoard());
-        setCellDrawStrategy(cellDrawStrategy);
-      }
-    } else {
-      setDimensions(0, 0);
-      setCellDrawStrategy(null);
+    if (setDimensions(game.getBoard().getWidth(), game.getBoard().getHeight())) {
+      backgroundTiles = new BackgroundTiles(game.getBoard());
     }
 
     invalidate();

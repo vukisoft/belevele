@@ -1,6 +1,4 @@
 <resources>
-
     <color name="black_overlay">#66000000</color>
-    <color name="blue_overlay">#660000AA</color>
-
+    <color name="next_stone_selection">#FF00CAFE</color>
 </resources>

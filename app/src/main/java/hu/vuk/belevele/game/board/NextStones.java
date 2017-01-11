@@ -78,7 +78,7 @@ public class NextStones {
   }
 
   public boolean isAvailable(int index) {
-    return !availables.contains(stones.get(index));
+    return availables.contains(stones.get(index));
   }
 
   public int getSelectedIndex() {

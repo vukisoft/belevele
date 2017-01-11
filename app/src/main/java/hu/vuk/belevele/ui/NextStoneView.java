@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Region.Op;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
@@ -13,55 +15,56 @@ import hu.vuk.belevele.game.board.NextStones;
 import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Point;
 
+import static hu.vuk.belevele.ui.DrawHelpers.drawBitmap;
+
 public class NextStoneView extends GridView {
 
+  public static final int SELECTION_WIDTH = 10;
   private NextStones nextStones;
 
-  private NextStoneListener nextStoneListener = new NextStoneListener() {
-    @Override
-    public void onSelection(Stone stone) {
-    }
-  };
+  private NextStoneListener nextStoneListener = (stone) -> {};
+
   private StoneResourceService stoneResourceService;
+
+  private final Paint paintSelection;
+  private final Paint paintDisabled;
 
   public NextStoneView(Context context, AttributeSet attrs) {
     super(context, attrs);
+    paintSelection = new Paint();
+    paintSelection.setColor(ContextCompat.getColor(context, R.color.next_stone_selection));
 
-    setCellDrawStrategy(new BitmapCellDrawStrategy() {
-      Paint paintSelection;
-      Paint paintDisabled;
+    paintDisabled = new Paint();
+    paintDisabled.setColor(ContextCompat.getColor(context, R.color.black_overlay));
+  }
 
-      {
-        paintSelection = new Paint();
-        paintSelection.setColor(getResources().getColor(R.color.blue_overlay));
+  @Override
+  public void drawCell(int x, int y, Canvas canvas, Rect rect) {
+    if (nextStones == null) {
+      return;
+    }
 
-        paintDisabled = new Paint();
-        paintDisabled.setColor(getResources().getColor(R.color.black_overlay));
-      }
+    boolean hasSelectingFeature = nextStones.getCount() > 1;
 
-      @Override
-      public void draw(int x, int y, Canvas canvas, Rect rect) {
-        drawBitmap(
-            stoneResourceService.getStoneResource(StoneResourceService.STONE),
-            255,
-            canvas, rect);
-        drawBitmap(
-            stoneResourceService.getStoneResource(nextStones.get(x)),
-            ViewSettings.STONE_TOP_ALPHA,
-            canvas, rect);
-        if (nextStones.isAvailable(x)) {
-          canvas.drawRect(rect, paintDisabled);
-        } else if (nextStones.getCount() > 1 && nextStones.getSelectedIndex() == x) {
-          Rect clipArea = new Rect(rect);
-          clipArea.top += 10;
-          clipArea.left += 10;
-          clipArea.bottom -= 10;
-          clipArea.right -= 10;
-          canvas.clipRect(clipArea, Op.XOR);
-          canvas.drawRect(rect, paintSelection);
-        }
-      }
-    });
+    if (hasSelectingFeature && nextStones.getSelectedIndex() == x) {
+      canvas.drawRect(rect, paintSelection);
+    }
+
+    if (hasSelectingFeature) {
+      rect.inset(SELECTION_WIDTH, SELECTION_WIDTH);
+    }
+
+    drawBitmap(
+        stoneResourceService.getStoneResource(StoneResourceService.STONE),
+        255,
+        canvas, rect);
+    drawBitmap(
+        stoneResourceService.getStoneResource(nextStones.get(x)),
+        ViewSettings.STONE_TOP_ALPHA,
+        canvas, rect);
+    if (!nextStones.isAvailable(x)) {
+      canvas.drawRect(rect, paintDisabled);
+    }
   }
 
   @Override
