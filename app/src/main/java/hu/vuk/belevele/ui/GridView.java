@@ -14,6 +14,8 @@ public abstract class GridView extends View {
   private int width;
   private int height;
 
+  private int gap = 0;
+
   public GridView(Context context, AttributeSet attrs) {
     super(context, attrs);
   }
@@ -27,25 +29,27 @@ public abstract class GridView extends View {
     return true;
   }
 
+  public void setGap(int gap) {
+    this.gap = gap;
+  }
+
   @Override
   protected void onDraw(Canvas canvas) {
     if (width == 0 || height == 0) {
       return;
     }
-    int cwidth = canvas.getWidth();
-    int cheight = canvas.getHeight();
-    int visibleWidth = cwidth / width;
-    int visibleHeight = cheight / height;
+    int visibleWidth = (canvas.getWidth() / width) - gap;
+    int visibleHeight = (canvas.getHeight() / height) - gap;
 
-    int startx = 0;
-    for (int x = 0; x < width; x++) {
-      int starty = 0;
-      for (int y = 0; y < height; y++) {
-        Rect dst = new Rect(startx, starty, startx + visibleWidth - 1, starty + visibleHeight - 1);
-        drawCell(x, y, canvas, dst);
-        starty += visibleHeight;
+    int posx = 0;
+    for (int cellx = 0; cellx < width; cellx++) {
+      int posy = 0;
+      for (int celly = 0; celly < height; celly++) {
+        Rect dst = new Rect(posx, posy, posx + visibleWidth, posy + visibleHeight);
+        drawCell(cellx, celly, canvas, dst);
+        posy += visibleHeight + gap;
       }
-      startx += visibleWidth;
+      posx += visibleWidth + gap;
     }
   }
 

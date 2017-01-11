@@ -1,4 +1,8 @@
 <resources>
+    <color name="background">#FF000000</color>
     <color name="black_overlay">#66000000</color>
     <color name="next_stone_selection">#FF00CAFE</color>
+    <color name="level_progress_color1">#FF00FE00</color>
+    <color name="level_progress_color2">#FFFE00</color>
+    <color name="level_progress_color3">#FFFE0000</color>
 </resources>

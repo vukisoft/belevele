@@ -10,6 +10,7 @@ import hu.vuk.belevele.game.board.Game;
 import hu.vuk.belevele.game.board.NextStones;
 import hu.vuk.belevele.ui.BoardListener;
 import hu.vuk.belevele.ui.BoardView;
+import hu.vuk.belevele.ui.GradientProgressView;
 import hu.vuk.belevele.ui.NextStoneView;
 import hu.vuk.belevele.ui.RandomStoneFactory;
 import hu.vuk.belevele.ui.StoneResourceService;
@@ -24,6 +25,7 @@ public class MainActivity extends Activity {
   private final StoneResourceService stoneResourceService = new StoneResourceService();
   private NextStoneView nextView;
   private BoardView boardView;
+  private GradientProgressView levelView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +36,16 @@ public class MainActivity extends Activity {
   }
 
   private void initialize() {
-    game = getLastGame();
+    game = getLastOrNewGame();
 
     nextView = (NextStoneView) findViewById(R.id.nextView);
     nextView.setStoneResourceService(stoneResourceService);
+
+    levelView = (GradientProgressView) findViewById(R.id.levelProgressView);
+    levelView.setColorRange(
+        R.color.level_progress_color1,
+        R.color.level_progress_color2,
+        R.color.level_progress_color3);
 
     boardView = (BoardView) findViewById(R.id.boardView);
     boardView.setStoneResourceService(stoneResourceService);
@@ -48,6 +56,7 @@ public class MainActivity extends Activity {
       public void onScoreChanged(int score, int multiplier) {
         scoreText.setText(getResources().getString(R.string.scoreText, score, multiplier));
         nextView.invalidate();
+        levelView.setValue(game.getBoard().getMultiplier());
       }
     });
 
@@ -68,6 +77,8 @@ public class MainActivity extends Activity {
   private void setGameToViews() {
     nextView.setNextStones(game.getNextStones());
     boardView.setGame(game);
+    levelView.setRange(0, 15); // TODO calculate value
+    levelView.setValue(game.getBoard().getMultiplier());
   }
 
   @Override
@@ -75,7 +86,7 @@ public class MainActivity extends Activity {
     return game;
   }
 
-  private Game getLastGame() {
+  private Game getLastOrNewGame() {
     Game game = (Game) getLastNonConfigurationInstance();
     if (game == null) {
       game = createNewGame();
