@@ -28,7 +28,7 @@ public class BoardView extends GridView {
 
   private Game game;
 
-  private DrawableResourceService drawableResourceService;
+  private BitmapResourceService bitmapResourceService;
   private BackgroundTiles backgroundTiles;
 
   private BoardListener boardListener = NOTHING;
@@ -44,11 +44,11 @@ public class BoardView extends GridView {
       backgroundTiles.draw(x, y, canvas, rect);
     } else {
       drawBitmap(
-          drawableResourceService.getResource(R.drawable.stone),
+          bitmapResourceService.getBitmap(R.drawable.stone),
           255,
           canvas, rect);
       drawBitmap(
-          drawableResourceService.getStoneResource(stone),
+          bitmapResourceService.getStoneBitmap(stone),
           ViewSettings.STONE_TOP_ALPHA,
           canvas, rect);
     }
@@ -56,12 +56,12 @@ public class BoardView extends GridView {
     Point point = new Point(x, y);
     if (game.isHighlightedPlaceForSelected(point)) {
       drawBitmap(
-          drawableResourceService.getResource(R.drawable.possible_move),
+          bitmapResourceService.getBitmap(R.drawable.possible_move),
           200,
           canvas, rect);
     } else if (game.isHighlightedPlace(point)) {
       drawBitmap(
-          drawableResourceService.getResource(R.drawable.possible_move_alternate),
+          bitmapResourceService.getBitmap(R.drawable.possible_move_alternate),
           200,
           canvas, rect);
     }
@@ -89,7 +89,7 @@ public class BoardView extends GridView {
 
   private void drawBackground(Canvas canvas) {
     drawBitmap(
-        drawableResourceService.getResource(R.drawable.board_background),
+        bitmapResourceService.getBitmap(R.drawable.board_background),
         100,
         canvas,
         new Rect(0, 0, canvas.getWidth(), canvas.getHeight()));
@@ -115,8 +115,8 @@ public class BoardView extends GridView {
     this.boardListener = boardListener;
   }
 
-  public void setDrawableResourceService(DrawableResourceService drawableResourceService) {
-    this.drawableResourceService = drawableResourceService;
+  public void setBitmapResourceService(BitmapResourceService bitmapResourceService) {
+    this.bitmapResourceService = bitmapResourceService;
   }
 
   // TODO set board only

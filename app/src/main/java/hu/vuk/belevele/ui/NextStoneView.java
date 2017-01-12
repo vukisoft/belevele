@@ -21,7 +21,7 @@ public class NextStoneView extends GridView {
 
   private NextStoneListener nextStoneListener = (stone) -> {};
 
-  private DrawableResourceService drawableResourceService;
+  private BitmapResourceService bitmapResourceService;
 
   private final Paint paintSelection;
   private final Paint paintDisabled;
@@ -52,11 +52,11 @@ public class NextStoneView extends GridView {
     }
 
     drawBitmap(
-        drawableResourceService.getResource(R.drawable.stone),
+        bitmapResourceService.getBitmap(R.drawable.stone),
         255,
         canvas, rect);
     drawBitmap(
-        drawableResourceService.getStoneResource(nextStones.get(x)),
+        bitmapResourceService.getStoneBitmap(nextStones.get(x)),
         ViewSettings.STONE_TOP_ALPHA,
         canvas, rect);
     if (!nextStones.isAvailable(x)) {
@@ -92,7 +92,7 @@ public class NextStoneView extends GridView {
     this.nextStoneListener = nextStoneListener;
   }
 
-  public void setDrawableResourceService(DrawableResourceService drawableResourceService) {
-    this.drawableResourceService = drawableResourceService;
+  public void setBitmapResourceService(BitmapResourceService bitmapResourceService) {
+    this.bitmapResourceService = bitmapResourceService;
   }
 }
