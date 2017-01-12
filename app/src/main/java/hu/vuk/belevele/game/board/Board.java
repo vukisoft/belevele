@@ -8,7 +8,6 @@ import java.util.Set;
 import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Matrix;
 import hu.vuk.belevele.game.struct.Matrix4;
-import hu.vuk.belevele.game.struct.Matrix6;
 import hu.vuk.belevele.game.struct.Point;
 
 public class Board {

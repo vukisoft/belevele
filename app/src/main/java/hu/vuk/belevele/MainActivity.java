@@ -10,10 +10,10 @@ import hu.vuk.belevele.game.board.Game;
 import hu.vuk.belevele.game.board.NextStones;
 import hu.vuk.belevele.ui.BoardListener;
 import hu.vuk.belevele.ui.BoardView;
+import hu.vuk.belevele.ui.DrawableResourceService;
 import hu.vuk.belevele.ui.GradientProgressView;
 import hu.vuk.belevele.ui.NextStoneView;
 import hu.vuk.belevele.ui.RandomStoneFactory;
-import hu.vuk.belevele.ui.StoneResourceService;
 
 public class MainActivity extends Activity {
 
@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
 
   private Game game;
 
-  private final StoneResourceService stoneResourceService = new StoneResourceService();
+  private DrawableResourceService drawableResourceService;
   private NextStoneView nextView;
   private BoardView boardView;
   private GradientProgressView levelView;
@@ -36,10 +36,11 @@ public class MainActivity extends Activity {
   }
 
   private void initialize() {
+    drawableResourceService = new DrawableResourceService(getApplicationContext());
     game = getLastOrNewGame();
 
     nextView = (NextStoneView) findViewById(R.id.nextView);
-    nextView.setStoneResourceService(stoneResourceService);
+    nextView.setDrawableResourceService(drawableResourceService);
 
     levelView = (GradientProgressView) findViewById(R.id.levelProgressView);
     levelView.setColorRange(
@@ -48,7 +49,7 @@ public class MainActivity extends Activity {
         R.color.level_progress_color3);
 
     boardView = (BoardView) findViewById(R.id.boardView);
-    boardView.setStoneResourceService(stoneResourceService);
+    boardView.setDrawableResourceService(drawableResourceService);
 
     final TextView scoreText = (TextView) findViewById(R.id.scoreTextView);
     boardView.setBoardListener(new BoardListener() {

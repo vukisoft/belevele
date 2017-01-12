@@ -1,8 +1,6 @@
 package hu.vuk.belevele.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -30,7 +28,7 @@ public class BoardView extends GridView {
 
   private Game game;
 
-  private StoneResourceService stoneResourceService;
+  private DrawableResourceService drawableResourceService;
   private BackgroundTiles backgroundTiles;
 
   private BoardListener boardListener = NOTHING;
@@ -46,11 +44,11 @@ public class BoardView extends GridView {
       backgroundTiles.draw(x, y, canvas, rect);
     } else {
       drawBitmap(
-          stoneResourceService.getStoneResource(StoneResourceService.STONE),
+          drawableResourceService.getResource(R.drawable.stone),
           255,
           canvas, rect);
       drawBitmap(
-          stoneResourceService.getStoneResource(stone),
+          drawableResourceService.getStoneResource(stone),
           ViewSettings.STONE_TOP_ALPHA,
           canvas, rect);
     }
@@ -58,13 +56,12 @@ public class BoardView extends GridView {
     Point point = new Point(x, y);
     if (game.isHighlightedPlaceForSelected(point)) {
       drawBitmap(
-          stoneResourceService.getStoneResource(StoneResourceService.POSSIBLE_MOVE),
+          drawableResourceService.getResource(R.drawable.possible_move),
           200,
           canvas, rect);
     } else if (game.isHighlightedPlace(point)) {
       drawBitmap(
-          stoneResourceService.getStoneResource(
-              StoneResourceService.POSSIBLE_MOVE_ALTERNATE),
+          drawableResourceService.getResource(R.drawable.possible_move_alternate),
           200,
           canvas, rect);
     }
@@ -91,15 +88,11 @@ public class BoardView extends GridView {
   }
 
   private void drawBackground(Canvas canvas) {
-    Bitmap boardBackground =
-        BitmapFactory.decodeResource(getResources(), R.drawable.board_background);
-    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    paint.setAlpha(100);
-    canvas.drawBitmap(
-        boardBackground,
-        new Rect(0, 0, boardBackground.getWidth(), boardBackground.getHeight()),
-        new Rect(0, 0, canvas.getWidth(), canvas.getHeight()),
-        paint);
+    drawBitmap(
+        drawableResourceService.getResource(R.drawable.board_background),
+        100,
+        canvas,
+        new Rect(0, 0, canvas.getWidth(), canvas.getHeight()));
   }
 
   @Override
@@ -122,8 +115,8 @@ public class BoardView extends GridView {
     this.boardListener = boardListener;
   }
 
-  public void setStoneResourceService(StoneResourceService stoneResourceService) {
-    this.stoneResourceService = stoneResourceService;
+  public void setDrawableResourceService(DrawableResourceService drawableResourceService) {
+    this.drawableResourceService = drawableResourceService;
   }
 
   // TODO set board only

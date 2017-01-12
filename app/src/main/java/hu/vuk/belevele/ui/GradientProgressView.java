@@ -7,9 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
@@ -28,7 +26,7 @@ public class GradientProgressView extends GridView {
   public void setColorRange(Integer... colors) {
     checkArgument(colors.length > 1);
     this.colors = FluentIterable.from(colors)
-        .transform((colorId) -> ContextCompat.getColor(getContext(), colorId))
+        .transform(colorId -> ContextCompat.getColor(getContext(), colorId))
         .toList();
     setGap(3);
   }

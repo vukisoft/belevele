@@ -4,15 +4,12 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.Region.Op;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import hu.vuk.belevele.R;
 import hu.vuk.belevele.game.board.NextStones;
-import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Point;
 
 import static hu.vuk.belevele.ui.DrawHelpers.drawBitmap;
@@ -24,7 +21,7 @@ public class NextStoneView extends GridView {
 
   private NextStoneListener nextStoneListener = (stone) -> {};
 
-  private StoneResourceService stoneResourceService;
+  private DrawableResourceService drawableResourceService;
 
   private final Paint paintSelection;
   private final Paint paintDisabled;
@@ -55,11 +52,11 @@ public class NextStoneView extends GridView {
     }
 
     drawBitmap(
-        stoneResourceService.getStoneResource(StoneResourceService.STONE),
+        drawableResourceService.getResource(R.drawable.stone),
         255,
         canvas, rect);
     drawBitmap(
-        stoneResourceService.getStoneResource(nextStones.get(x)),
+        drawableResourceService.getStoneResource(nextStones.get(x)),
         ViewSettings.STONE_TOP_ALPHA,
         canvas, rect);
     if (!nextStones.isAvailable(x)) {
@@ -95,7 +92,7 @@ public class NextStoneView extends GridView {
     this.nextStoneListener = nextStoneListener;
   }
 
-  public void setStoneResourceService(StoneResourceService stoneResourceService) {
-    this.stoneResourceService = stoneResourceService;
+  public void setDrawableResourceService(DrawableResourceService drawableResourceService) {
+    this.drawableResourceService = drawableResourceService;
   }
 }
