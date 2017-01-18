@@ -8,9 +8,9 @@ import android.widget.TextView;
 import hu.vuk.belevele.game.board.Board;
 import hu.vuk.belevele.game.board.Game;
 import hu.vuk.belevele.game.board.NextStones;
-import hu.vuk.belevele.ui.BoardListener;
+import hu.vuk.belevele.ui.BitmapDrawableResourceService;
 import hu.vuk.belevele.ui.BoardView;
-import hu.vuk.belevele.ui.BitmapResourceService;
+import hu.vuk.belevele.ui.DrawableResourceService;
 import hu.vuk.belevele.ui.GradientProgressView;
 import hu.vuk.belevele.ui.NextStoneView;
 import hu.vuk.belevele.ui.RandomStoneFactory;
@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
 
   private Game game;
 
-  private BitmapResourceService bitmapResourceService;
+  private DrawableResourceService drawableResourceService;
   private NextStoneView nextView;
   private BoardView boardView;
   private GradientProgressView levelView;
@@ -36,11 +36,11 @@ public class MainActivity extends Activity {
   }
 
   private void initialize() {
-    bitmapResourceService = new BitmapResourceService(getApplicationContext());
+    drawableResourceService = new BitmapDrawableResourceService(getApplicationContext());
     game = getLastOrNewGame();
 
     nextView = (NextStoneView) findViewById(R.id.nextView);
-    nextView.setBitmapResourceService(bitmapResourceService);
+    nextView.setDrawableResourceService(drawableResourceService);
 
     levelView = (GradientProgressView) findViewById(R.id.levelProgressView);
     levelView.setColorRange(
@@ -49,17 +49,15 @@ public class MainActivity extends Activity {
         R.color.level_progress_color3);
 
     boardView = (BoardView) findViewById(R.id.boardView);
-    boardView.setBitmapResourceService(bitmapResourceService);
+    boardView.setDrawableResourceService(drawableResourceService);
 
     final TextView scoreText = (TextView) findViewById(R.id.scoreTextView);
-    boardView.setBoardListener(new BoardListener() {
-      @Override
-      public void onScoreChanged(int score, int multiplier) {
-        scoreText.setText(getResources().getString(R.string.scoreText, score, multiplier));
-        nextView.invalidate();
-        levelView.setValue(game.getBoard().getMultiplier());
-      }
-    });
+    boardView.setBoardListener(
+        (score, multiplier) -> {
+          scoreText.setText(getResources().getString(R.string.scoreText, score, multiplier));
+          nextView.invalidate();
+          levelView.setValue(game.getBoard().getMultiplier());
+        });
 
     nextView.setNextStoneListener(stone -> {
       boardView.invalidate();

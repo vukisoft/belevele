@@ -12,8 +12,6 @@ import hu.vuk.belevele.R;
 import hu.vuk.belevele.game.board.NextStones;
 import hu.vuk.belevele.game.struct.Point;
 
-import static hu.vuk.belevele.ui.DrawHelpers.drawBitmap;
-
 public class NextStoneView extends GridView {
 
   public static final int SELECTION_WIDTH = 10;
@@ -21,7 +19,7 @@ public class NextStoneView extends GridView {
 
   private NextStoneListener nextStoneListener = (stone) -> {};
 
-  private BitmapResourceService bitmapResourceService;
+  private DrawableResourceService drawableResourceService;
 
   private final Paint paintSelection;
   private final Paint paintDisabled;
@@ -51,13 +49,8 @@ public class NextStoneView extends GridView {
       rect.inset(SELECTION_WIDTH, SELECTION_WIDTH);
     }
 
-    drawBitmap(
-        bitmapResourceService.getBitmap(R.drawable.stone),
-        255,
-        canvas, rect);
-    drawBitmap(
-        bitmapResourceService.getStoneBitmap(nextStones.get(x)),
-        ViewSettings.STONE_TOP_ALPHA,
+    drawableResourceService.drawStone(
+        nextStones.get(x),
         canvas, rect);
     if (!nextStones.isAvailable(x)) {
       canvas.drawRect(rect, paintDisabled);
@@ -92,7 +85,7 @@ public class NextStoneView extends GridView {
     this.nextStoneListener = nextStoneListener;
   }
 
-  public void setBitmapResourceService(BitmapResourceService bitmapResourceService) {
-    this.bitmapResourceService = bitmapResourceService;
+  public void setDrawableResourceService(DrawableResourceService drawableResourceService) {
+    this.drawableResourceService = drawableResourceService;
   }
 }

@@ -20,7 +20,6 @@ import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Point;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static hu.vuk.belevele.ui.DrawHelpers.drawBitmap;
 
 public class BoardView extends GridView {
 
@@ -28,7 +27,7 @@ public class BoardView extends GridView {
 
   private Game game;
 
-  private BitmapResourceService bitmapResourceService;
+  private DrawableResourceService drawableResourceService;
   private BackgroundTiles backgroundTiles;
 
   private BoardListener boardListener = NOTHING;
@@ -43,25 +42,18 @@ public class BoardView extends GridView {
     if (stone == null) {
       backgroundTiles.draw(x, y, canvas, rect);
     } else {
-      drawBitmap(
-          bitmapResourceService.getBitmap(R.drawable.stone),
-          255,
-          canvas, rect);
-      drawBitmap(
-          bitmapResourceService.getStoneBitmap(stone),
-          ViewSettings.STONE_TOP_ALPHA,
-          canvas, rect);
+      drawableResourceService.drawStone(stone, canvas, rect);
     }
 
     Point point = new Point(x, y);
     if (game.isHighlightedPlaceForSelected(point)) {
-      drawBitmap(
-          bitmapResourceService.getBitmap(R.drawable.possible_move),
+      drawableResourceService.drawDrawable(
+          R.drawable.possible_move,
           200,
           canvas, rect);
     } else if (game.isHighlightedPlace(point)) {
-      drawBitmap(
-          bitmapResourceService.getBitmap(R.drawable.possible_move_alternate),
+      drawableResourceService.drawDrawable(
+          R.drawable.possible_move_alternate,
           200,
           canvas, rect);
     }
@@ -88,8 +80,8 @@ public class BoardView extends GridView {
   }
 
   private void drawBackground(Canvas canvas) {
-    drawBitmap(
-        bitmapResourceService.getBitmap(R.drawable.board_background),
+    drawableResourceService.drawDrawable(
+        R.drawable.board_background,
         100,
         canvas,
         new Rect(0, 0, canvas.getWidth(), canvas.getHeight()));
@@ -115,8 +107,8 @@ public class BoardView extends GridView {
     this.boardListener = boardListener;
   }
 
-  public void setBitmapResourceService(BitmapResourceService bitmapResourceService) {
-    this.bitmapResourceService = bitmapResourceService;
+  public void setDrawableResourceService(DrawableResourceService drawableResourceService) {
+    this.drawableResourceService = drawableResourceService;
   }
 
   // TODO set board only
@@ -161,7 +153,7 @@ public class BoardView extends GridView {
           Color.blue(color));
     }
 
-    public void draw(int x, int y, Canvas canvas, Rect rect) {
+    void draw(int x, int y, Canvas canvas, Rect rect) {
       Paint paint = new Paint();
       paint.setColor(bgstones[x][y]);
       canvas.drawRect(rect, paint);
