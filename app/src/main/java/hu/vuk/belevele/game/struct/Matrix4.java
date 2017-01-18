@@ -4,9 +4,6 @@ import com.google.common.collect.ImmutableList;
 
 public class Matrix4<T> extends Matrix<T> {
 
-  private static final ImmutableList<Point> NEIGBOUR_DELTA_POINTS = ImmutableList.of(
-  );
-
   public Matrix4(int width, int height, Class<T> type) {
     super(width, height, type);
   }
