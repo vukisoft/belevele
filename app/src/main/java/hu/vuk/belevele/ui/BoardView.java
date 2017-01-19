@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -24,10 +25,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BoardView extends GridView {
 
   private static final BoardListener NOTHING = (score, multiplier) -> {};
+  private static final float MARK_INSET_RATIO = 0.36f;
+  private static final float SMALL_MARK_INSET_RATIO = 0.43f;
 
   private Game game;
 
-  private DrawableResourceService drawableResourceService;
+  private DrawableService drawableService;
   private BackgroundTiles backgroundTiles;
 
   private BoardListener boardListener = NOTHING;
@@ -42,20 +45,23 @@ public class BoardView extends GridView {
     if (stone == null) {
       backgroundTiles.draw(x, y, canvas, rect);
     } else {
-      drawableResourceService.drawStone(stone, canvas, rect);
+      drawableService.drawStone(stone, canvas, rect);
     }
 
     Point point = new Point(x, y);
+    Drawable markDrawable = drawableService.newDrawableLoader(R.drawable.ic_mark)
+        .withColor(Color.CYAN)
+        .load();
     if (game.isHighlightedPlaceForSelected(point)) {
-      drawableResourceService.drawDrawable(
-          R.drawable.possible_move,
-          200,
-          canvas, rect);
+      rect.inset(
+          (int) (rect.width() * MARK_INSET_RATIO),
+          (int) (rect.height() * MARK_INSET_RATIO));
+      drawableService.drawDrawable(markDrawable, canvas, rect);
     } else if (game.isHighlightedPlace(point)) {
-      drawableResourceService.drawDrawable(
-          R.drawable.possible_move_alternate,
-          200,
-          canvas, rect);
+      rect.inset(
+          (int) (rect.width() * SMALL_MARK_INSET_RATIO),
+          (int) (rect.height() * SMALL_MARK_INSET_RATIO));
+      drawableService.drawDrawable(markDrawable, canvas, rect);
     }
   }
 
@@ -80,9 +86,9 @@ public class BoardView extends GridView {
   }
 
   private void drawBackground(Canvas canvas) {
-    drawableResourceService.drawDrawable(
-        R.drawable.board_background,
-        100,
+    drawableService.drawDrawable(
+        drawableService.newDrawableLoader(
+            R.drawable.board_background).withAlpha(100).load(),
         canvas,
         new Rect(0, 0, canvas.getWidth(), canvas.getHeight()));
   }
@@ -107,8 +113,8 @@ public class BoardView extends GridView {
     this.boardListener = boardListener;
   }
 
-  public void setDrawableResourceService(DrawableResourceService drawableResourceService) {
-    this.drawableResourceService = drawableResourceService;
+  public void setDrawableService(DrawableService drawableService) {
+    this.drawableService = drawableService;
   }
 
   // TODO set board only
