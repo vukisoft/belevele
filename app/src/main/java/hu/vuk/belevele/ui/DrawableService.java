@@ -24,7 +24,6 @@ public class DrawableService {
   public static final float SHADOW_OFFSET = 1.5f;
 
   private final LoadingCache<DrawableKey, Drawable> drawableCache;
-  private final LoadingCache<String, Integer> resourceIdCache;
   private final float dpToPx;
 
   public DrawableService(Context context) {
@@ -43,14 +42,6 @@ public class DrawableService {
           }
           return drawable;
         }));
-    resourceIdCache = CacheBuilder.newBuilder()
-        .build(CacheLoader.from(
-            name ->
-                context.getResources().getIdentifier(name, "drawable", context.getPackageName())));
-  }
-
-  private int getResourceId(String name) {
-    return resourceIdCache.getUnchecked(name);
   }
 
   public void drawStone(Stone stone, Canvas canvas, Rect rect) {
@@ -60,13 +51,13 @@ public class DrawableService {
 
     int shadowOffset = toPx(SHADOW_OFFSET);
     rect.offset(shadowOffset, shadowOffset);
-    Drawable shadow = getDrawable(getResourceId("ic_" + stone.getShape().name().toLowerCase()))
+    Drawable shadow = getDrawable(stone.getShape().resourceId)
         .withColor(Color.BLACK)
         .withAlpha(180)
         .load();
     drawDrawable(shadow, canvas, rect);
     rect.offset(-shadowOffset, -shadowOffset);
-    Drawable drawable = getDrawable(getResourceId("ic_" + stone.getShape().name().toLowerCase()))
+    Drawable drawable = getDrawable(stone.getShape().resourceId)
         .withColor(stone.getColor().color)
         .load();
     drawDrawable(drawable, canvas, rect);

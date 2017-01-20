@@ -12,9 +12,11 @@ import hu.vuk.belevele.R;
 import hu.vuk.belevele.game.board.NextStones;
 import hu.vuk.belevele.game.struct.Point;
 
+import static hu.vuk.belevele.ui.UiUtils.shrinkByRatio;
+
 public class NextStoneView extends GridView {
 
-  public static final int SELECTION_WIDTH = 10;
+  private static final float SELECTION_INSET_RATIO = 0.2f;
   private NextStones nextStones;
 
   private NextStoneListener nextStoneListener = (stone) -> {};
@@ -46,12 +48,10 @@ public class NextStoneView extends GridView {
     }
 
     if (hasSelectingFeature) {
-      rect.inset(SELECTION_WIDTH, SELECTION_WIDTH);
+      shrinkByRatio(rect, SELECTION_INSET_RATIO);
     }
 
-    drawableService.drawStone(
-        nextStones.get(x),
-        canvas, rect);
+    drawableService.drawStone(nextStones.get(x), canvas, new Rect(rect));
     if (!nextStones.isAvailable(x)) {
       canvas.drawRect(rect, paintDisabled);
     }

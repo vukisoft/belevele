@@ -21,12 +21,13 @@ import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Point;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static hu.vuk.belevele.ui.UiUtils.shrinkByRatio;
 
 public class BoardView extends GridView {
 
   private static final BoardListener NOTHING = (score, multiplier) -> {};
-  private static final float MARK_INSET_RATIO = 0.36f;
-  private static final float SMALL_MARK_INSET_RATIO = 0.43f;
+  private static final float MARK_INSET_RATIO = 0.72f;
+  private static final float SMALL_MARK_INSET_RATIO = 0.86f;
 
   private Game game;
 
@@ -53,14 +54,10 @@ public class BoardView extends GridView {
         .withColor(Color.CYAN)
         .load();
     if (game.isHighlightedPlaceForSelected(point)) {
-      rect.inset(
-          (int) (rect.width() * MARK_INSET_RATIO),
-          (int) (rect.height() * MARK_INSET_RATIO));
+      shrinkByRatio(rect, MARK_INSET_RATIO);
       drawableService.drawDrawable(markDrawable, canvas, rect);
     } else if (game.isHighlightedPlace(point)) {
-      rect.inset(
-          (int) (rect.width() * SMALL_MARK_INSET_RATIO),
-          (int) (rect.height() * SMALL_MARK_INSET_RATIO));
+      shrinkByRatio(rect, SMALL_MARK_INSET_RATIO);
       drawableService.drawDrawable(markDrawable, canvas, rect);
     }
   }
