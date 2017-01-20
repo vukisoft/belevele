@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "hu.vuk.belevele"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 4
         versionName "1.3"

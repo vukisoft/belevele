@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 
@@ -17,11 +18,13 @@ import com.google.common.cache.LoadingCache;
 import hu.vuk.belevele.R;
 import hu.vuk.belevele.game.stone.Stone;
 
+import static hu.vuk.belevele.ui.UiUtils.shrinkByRatio;
+
 public class DrawableService {
 
-  public static final int NO_VALUE = 0;
-  public static final double STONE_INSET_RATIO = 0.2  ;
-  public static final float SHADOW_OFFSET = 1.5f;
+  private static final int NO_VALUE = 0;
+  private static final float STONE_INSET_RATIO = 0.4f;
+  private static final float SHADOW_OFFSET_DP = 1.5f;
 
   private final LoadingCache<DrawableKey, Drawable> drawableCache;
   private final float dpToPx;
@@ -30,7 +33,7 @@ public class DrawableService {
     dpToPx = TypedValue.applyDimension(
         TypedValue.COMPLEX_UNIT_DIP, 1, context.getResources().getDisplayMetrics());
     drawableCache = CacheBuilder.newBuilder()
-        .build(CacheLoader.from((DrawableKey key) -> {
+        .build(CacheLoader.from((@NonNull DrawableKey key) -> {
           Drawable drawable = ContextCompat.getDrawable(context, key.resourceId);
           if (key.color != NO_VALUE) {
             drawable = drawable.mutate();
@@ -47,13 +50,13 @@ public class DrawableService {
   public void drawStone(Stone stone, Canvas canvas, Rect rect) {
     drawDrawable(R.drawable.stone, canvas, rect);
 
-    rect.inset((int) (STONE_INSET_RATIO * rect.width()), (int) (STONE_INSET_RATIO * rect.height()));
+    shrinkByRatio(rect, STONE_INSET_RATIO);
 
-    int shadowOffset = toPx(SHADOW_OFFSET);
+    int shadowOffset = toPx(SHADOW_OFFSET_DP);
     rect.offset(shadowOffset, shadowOffset);
     Drawable shadow = getDrawable(stone.getShape().resourceId)
         .withColor(Color.BLACK)
-        .withAlpha(180)
+        .withAlpha(120)
         .load();
     drawDrawable(shadow, canvas, rect);
     rect.offset(-shadowOffset, -shadowOffset);
