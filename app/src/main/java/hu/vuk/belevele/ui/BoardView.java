@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -21,7 +20,6 @@ import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Point;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static hu.vuk.belevele.ui.UiUtils.shrinkByRatio;
 
 public class BoardView extends GridView {
 
@@ -50,15 +48,14 @@ public class BoardView extends GridView {
     }
 
     Point point = new Point(x, y);
-    Drawable markDrawable = drawableService.newDrawableLoader(R.drawable.ic_mark)
-        .withColor(Color.CYAN)
-        .load();
+    DrawableService.Drawing markDrawing = drawableService.draw(R.drawable.ic_mark)
+        .withColor(Color.CYAN);
     if (game.isHighlightedPlaceForSelected(point)) {
-      shrinkByRatio(rect, MARK_INSET_RATIO);
-      drawableService.drawDrawable(markDrawable, canvas, rect);
+      markDrawing.withRectShrinkingByRatio(MARK_INSET_RATIO)
+          .to(canvas, rect);
     } else if (game.isHighlightedPlace(point)) {
-      shrinkByRatio(rect, SMALL_MARK_INSET_RATIO);
-      drawableService.drawDrawable(markDrawable, canvas, rect);
+      markDrawing.withRectShrinkingByRatio(SMALL_MARK_INSET_RATIO)
+          .to(canvas, rect);
     }
   }
 
@@ -83,11 +80,9 @@ public class BoardView extends GridView {
   }
 
   private void drawBackground(Canvas canvas) {
-    drawableService.drawDrawable(
-        drawableService.newDrawableLoader(
-            R.drawable.board_background).withAlpha(100).load(),
-        canvas,
-        new Rect(0, 0, canvas.getWidth(), canvas.getHeight()));
+    drawableService.draw(R.drawable.board_background)
+        .withAlpha(100)
+        .to(canvas, new Rect(0, 0, canvas.getWidth(), canvas.getHeight()));
   }
 
   @Override

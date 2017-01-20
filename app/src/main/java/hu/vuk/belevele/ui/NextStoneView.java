@@ -51,7 +51,7 @@ public class NextStoneView extends GridView {
       shrinkByRatio(rect, SELECTION_INSET_RATIO);
     }
 
-    drawableService.drawStone(nextStones.get(x), canvas, new Rect(rect));
+    drawableService.drawStone(nextStones.get(x), canvas, rect);
     if (!nextStones.isAvailable(x)) {
       canvas.drawRect(rect, paintDisabled);
     }

@@ -53,7 +53,8 @@ public class NextStones {
   }
 
   public boolean setSelected(int selected) {
-    if (!availables.contains(stones.get(selected))) {
+    if (selected < 0 || selected >= stones.size()
+        || !availables.contains(stones.get(selected))) {
       return false;
     }
 

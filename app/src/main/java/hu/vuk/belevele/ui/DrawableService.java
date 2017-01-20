@@ -15,6 +15,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import hu.vuk.belevele.R;
 import hu.vuk.belevele.game.stone.Stone;
 
@@ -48,66 +51,80 @@ public class DrawableService {
   }
 
   public void drawStone(Stone stone, Canvas canvas, Rect rect) {
-    drawDrawable(R.drawable.stone, canvas, rect);
-
-    shrinkByRatio(rect, STONE_INSET_RATIO);
-
-    int shadowOffset = toPx(SHADOW_OFFSET_DP);
-    rect.offset(shadowOffset, shadowOffset);
-    Drawable shadow = getDrawable(stone.getShape().resourceId)
-        .withColor(Color.BLACK)
-        .withAlpha(120)
-        .load();
-    drawDrawable(shadow, canvas, rect);
-    rect.offset(-shadowOffset, -shadowOffset);
-    Drawable drawable = getDrawable(stone.getShape().resourceId)
+    draw(R.drawable.stone).to(canvas, rect);
+    draw(stone.getShape().resourceId)
         .withColor(stone.getColor().color)
-        .load();
-    drawDrawable(drawable, canvas, rect);
+        .withShadow()
+        .withRectShrinkingByRatio(STONE_INSET_RATIO)
+        .to(canvas, rect);
   }
 
-  public void drawDrawable(int resourceId, Canvas canvas, Rect rect) {
-    drawDrawable(getDrawable(resourceId).load(), canvas, rect);
-  }
-
-  public void drawDrawable(Drawable drawable, Canvas canvas, Rect rect) {
-    drawable.setBounds(rect);
-    drawable.draw(canvas);
-  }
-
-  public DrawableLoader newDrawableLoader(int resourceId) {
-    return new DrawableLoader(resourceId);
-  }
-
-  private DrawableLoader getDrawable(int resourceId) {
-    return new DrawableLoader(resourceId);
+  public Drawing draw(int resourceId) {
+    return new Drawing(resourceId);
   }
 
   private int toPx(float dp) {
     return (int) (dpToPx * dp);
   }
 
-  public class DrawableLoader {
+  public class Drawing {
     private final int resourceId;
     private int color = NO_VALUE;
     private int alpha = NO_VALUE;
+    private List<Consumer<Rect>> rectTransformations = new ArrayList<>();
+    private boolean drawShadow;
 
-    DrawableLoader(int resourceId) {
+    Drawing(int resourceId) {
       this.resourceId = resourceId;
     }
 
-    public DrawableLoader withColor(int color) {
+    public Drawing withColor(int color) {
       this.color = color;
       return this;
     }
 
-    public DrawableLoader withAlpha(int alpha) {
+    public Drawing withAlpha(int alpha) {
       this.alpha = alpha;
       return this;
     }
 
-    public Drawable load() {
+    public Drawing withRectTransformation(Consumer<Rect> rectTransformer) {
+      this.rectTransformations.add(rectTransformer);
+      return this;
+    }
+
+    public Drawing withRectShrinkingByRatio(float ratio) {
+      this.rectTransformations.add(r -> shrinkByRatio(r, ratio));
+      return this;
+    }
+
+    private Drawable load() {
       return drawableCache.getUnchecked(new DrawableKey(resourceId, color, alpha));
+    }
+
+    public Drawing withShadow() {
+      this.drawShadow = true;
+      return this;
+    }
+
+    public void to(Canvas canvas, Rect rect) {
+      Drawable drawable = load();
+      if (rectTransformations.size() > 0) {
+        rect = new Rect(rect);
+        for (Consumer<Rect> transformer : rectTransformations) {
+          transformer.accept(rect);
+        }
+      }
+      if (drawShadow) {
+        int shadowOffset = toPx(SHADOW_OFFSET_DP);
+        DrawableService.this.draw(resourceId)
+            .withColor(Color.BLACK)
+            .withAlpha(120)
+            .withRectTransformation(r -> { r.offset(shadowOffset, shadowOffset); })
+            .to(canvas, rect);
+      }
+      drawable.setBounds(rect);
+      drawable.draw(canvas);
     }
   }
 
