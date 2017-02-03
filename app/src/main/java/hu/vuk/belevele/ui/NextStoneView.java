@@ -10,7 +10,6 @@ import android.view.MotionEvent;
 
 import hu.vuk.belevele.R;
 import hu.vuk.belevele.game.board.NextStones;
-import hu.vuk.belevele.game.struct.Point;
 
 import static hu.vuk.belevele.ui.UiUtils.shrinkByRatio;
 
@@ -59,8 +58,7 @@ public class NextStoneView extends GridView {
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    Point point = getTouchedCell(event);
-    setSelected(point.getX());
+    setSelected(getTouchedX(event.getX()));
     invalidate();
     return true;
   }

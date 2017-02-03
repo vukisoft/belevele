@@ -1,8 +1,6 @@
 package hu.vuk.belevele.game.struct;
 
-import com.google.common.collect.ImmutableList;
-
-public class Matrix6<T> extends Matrix<T> {
+public abstract class Matrix6<T> extends Matrix<T> {
 
   public Matrix6(int width, int height, Class<T> type) {
     super(width, height, type);
@@ -14,18 +12,6 @@ public class Matrix6<T> extends Matrix<T> {
 
   private int widthOf(int y) {
     return getWidth() - y % 2;
-  }
-
-  @Override
-  protected Iterable<Point> getAllNeighbourPoints(int x, int y) {
-    int mod = y % 2;
-    return ImmutableList.of(
-        new Point(x - 1, y),
-        new Point(x + 1, y),
-        new Point(x - 1 + mod, y - 1),
-        new Point(x + mod, y - 1),
-        new Point(x - 1 + mod, y + 1),
-        new Point(x + mod, y + 1));
   }
 
   @Override

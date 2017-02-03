@@ -7,7 +7,7 @@
               android:weightSum="1"
               android:background="@color/background">
 
-    <hu.vuk.belevele.ui.BoardView
+    <hu.vuk.belevele.ui.Board6vView
         android:id="@+id/boardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

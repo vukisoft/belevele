@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 
 import com.google.common.collect.ImmutableList;
 
@@ -16,62 +15,37 @@ import java.util.Random;
 import hu.vuk.belevele.R;
 import hu.vuk.belevele.game.board.Board;
 import hu.vuk.belevele.game.board.Game;
-import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Point;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class BoardView extends GridView {
-
+public abstract class BoardView extends GridView {
+  protected static final float MARK_INSET_RATIO = 0.72f;
+  protected static final float SMALL_MARK_INSET_RATIO = 0.86f;
   private static final BoardListener NOTHING = (score, multiplier) -> {};
-  private static final float MARK_INSET_RATIO = 0.72f;
-  private static final float SMALL_MARK_INSET_RATIO = 0.86f;
-
-  private Game game;
-
-  private DrawableService drawableService;
-  private BackgroundTiles backgroundTiles;
-
-  private BoardListener boardListener = NOTHING;
+  private static final Random RND = new Random();
+  private static final ImmutableList<Integer> COLORS = ImmutableList.of(
+      Color.argb(255, 255, 0, 0),
+      Color.argb(255, 0, 255, 0),
+      Color.argb(255, 0, 0, 255),
+      Color.argb(255, 255, 255, 0),
+      Color.argb(255, 0, 255, 255),
+      Color.argb(255, 255, 0, 255));
+  protected Game game;
+  protected DrawableService drawableService;
+  protected BackgroundTiles backgroundTiles;
+  protected BoardListener boardListener = NOTHING;
 
   public BoardView(Context context, AttributeSet attrs) {
     super(context, attrs);
   }
 
-  @Override
-  public void drawCell(int x, int y, Canvas canvas, Rect rect) {
-    Stone stone = game.getBoard().get(x, y);
-    if (stone == null) {
-      backgroundTiles.draw(x, y, canvas, rect);
-    } else {
-      drawableService.drawStone(stone, canvas, rect);
-    }
-
-    Point point = new Point(x, y);
-    DrawableService.Drawing markDrawing = drawableService.draw(R.drawable.ic_mark)
-        .withColor(Color.CYAN);
-    if (game.isHighlightedPlaceForSelected(point)) {
-      markDrawing.withRectShrinkingByRatio(MARK_INSET_RATIO)
-          .to(canvas, rect);
-    } else if (game.isHighlightedPlace(point)) {
-      markDrawing.withRectShrinkingByRatio(SMALL_MARK_INSET_RATIO)
-          .to(canvas, rect);
-    }
-  }
-
-  private void fireScoreEvent() {
+  protected void fireScoreEvent() {
     // TODO make game keep the score
     boardListener.onScoreChanged(game.getBoard().getScore(), game.getBoard().getMultiplier());
   }
 
-  @Override
-  protected void onDraw(Canvas canvas) {
-    drawBackground(canvas);
-    super.onDraw(canvas);
-    drawDropShadowIfNeeded(canvas);
-  }
-
-  private void drawDropShadowIfNeeded(Canvas canvas) {
+  protected void drawDropShadowIfNeeded(Canvas canvas) {
     if (game.isOver()) {
       Paint paintDarkOverlay = new Paint();
       paintDarkOverlay.setColor(ContextCompat.getColor(getContext(), R.color.black_overlay));
@@ -79,30 +53,21 @@ public class BoardView extends GridView {
     }
   }
 
-  private void drawBackground(Canvas canvas) {
+  protected void drawBackground(Canvas canvas) {
     drawableService.draw(R.drawable.board_background)
         .withAlpha(100)
         .to(canvas, new Rect(0, 0, canvas.getWidth(), canvas.getHeight()));
   }
 
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    if (event.getAction() != MotionEvent.ACTION_DOWN) {
-      // we don't care if not down
-      return false;
+  protected void drawMark(int x, int y, Canvas canvas, Rect rect) {
+    Point point = new Point(x, y);
+    if (game.isHighlightedPlace(point)) {
+      drawableService.draw(R.drawable.ic_mark)
+          .withRectShrinkingByRatio(
+              game.isHighlightedPlaceForSelected(point)
+                  ? MARK_INSET_RATIO : SMALL_MARK_INSET_RATIO)
+          .to(canvas, rect);
     }
-
-    Point point = getTouchedCell(event);
-    if (game.placeNext(point.getX(), point.getY())) {
-      fireScoreEvent();
-      invalidate();
-    }
-
-    return true;
-  }
-
-  public void setBoardListener(BoardListener boardListener) {
-    this.boardListener = boardListener;
   }
 
   public void setDrawableService(DrawableService drawableService) {
@@ -121,16 +86,18 @@ public class BoardView extends GridView {
     fireScoreEvent();
   }
 
-  private static final Random RND = new Random();
+  @Override
+  protected void onDraw(Canvas canvas) {
+    drawBackground(canvas);
+    super.onDraw(canvas);
+    drawDropShadowIfNeeded(canvas);
+  }
 
-  private static final ImmutableList<Integer> COLORS = ImmutableList.of(
-      Color.argb(255, 255, 0, 0),
-      Color.argb(255, 0, 255, 0),
-      Color.argb(255, 0, 0, 255),
-      Color.argb(255, 255, 255, 0),
-      Color.argb(255, 0, 255, 255),
-      Color.argb(255, 255, 0, 255));
-  private static class BackgroundTiles {
+  public void setBoardListener(BoardListener boardListener) {
+    this.boardListener = boardListener;
+  }
+
+  protected static class BackgroundTiles {
     private int[][] bgstones;
     BackgroundTiles(Board board) {
       bgstones = new int[board.getWidth()][];
@@ -151,10 +118,14 @@ public class BoardView extends GridView {
           Color.blue(color));
     }
 
-    void draw(int x, int y, Canvas canvas, Rect rect) {
+    protected int getColor(int x, int y) {
+      return bgstones[x][y];
+    }
+
+    protected Paint getPaint(int x, int y) {
       Paint paint = new Paint();
-      paint.setColor(bgstones[x][y]);
-      canvas.drawRect(rect, paint);
+      paint.setColor(getColor(x, y));
+      return paint;
     }
   }
 }

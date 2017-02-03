@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 
 import hu.vuk.belevele.game.struct.Point;
@@ -15,6 +14,9 @@ public abstract class GridView extends View {
   private int height;
 
   private int gap = 0;
+  private int horizontalPadding = 0;
+  private int verticalPadding = 0;
+  private float ratio = 1;
 
   public GridView(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -31,6 +33,18 @@ public abstract class GridView extends View {
 
   public void setGap(int gap) {
     this.gap = gap;
+  }
+
+  public void setRatio(float ratio) {
+    this.ratio = ratio;
+  }
+
+  public void setHorizontalPadding(int horizontalPadding) {
+    this.horizontalPadding = horizontalPadding;
+  }
+
+  public void setVerticalPadding(int verticalPadding) {
+    this.verticalPadding = verticalPadding;
   }
 
   @Override
@@ -53,14 +67,24 @@ public abstract class GridView extends View {
     }
   }
 
-  protected Point getTouchedCell(MotionEvent event) {
-    int cwidth = getWidth();
-    int cheight = getHeight();
-    int visibleWidth = cwidth / width;
-    int visibleHeight = cheight / height;
-    int x = (int) (event.getX() / visibleWidth);
-    int y = (int) (event.getY() / visibleHeight);
-    return new Point(x, y);
+  public int getGridWidth() {
+    return width;
+  }
+
+  public int getGridHeight() {
+    return height;
+  }
+
+  protected int getTouchedX(float pointX) {
+    return (int) (pointX * width / getWidth());
+  }
+
+  protected int getTouchedY(float pointY) {
+    return (int) (pointY * height / getHeight());
+  }
+
+  protected Point getTouchedCell(float pointX, float pointY) {
+    return new Point(getTouchedX(pointX), getTouchedY(pointY));
   }
 
   protected abstract void drawCell(int x, int y, Canvas canvas, Rect rect);
@@ -74,12 +98,14 @@ public abstract class GridView extends View {
     int originalWidth = MeasureSpec.getSize(widthMeasureSpec);
     int originalHeight = MeasureSpec.getSize(heightMeasureSpec);
 
-    int calculatedHeight = originalWidth * height / width;
+    float calculatedHeightRatio = ratio * height / width;
+
+    int calculatedHeight = (int) (originalWidth * calculatedHeightRatio);
 
     int finalWidth, finalHeight;
 
     if (calculatedHeight > originalHeight) {
-      finalWidth = originalHeight * width / height;
+      finalWidth = (int) (originalHeight / calculatedHeightRatio);
       finalHeight = originalHeight;
     } else {
       finalWidth = originalWidth;

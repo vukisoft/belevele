@@ -8,7 +8,9 @@ import android.widget.TextView;
 import hu.vuk.belevele.game.board.Board;
 import hu.vuk.belevele.game.board.Game;
 import hu.vuk.belevele.game.board.NextStones;
-import hu.vuk.belevele.ui.BoardView;
+import hu.vuk.belevele.game.stone.Stone;
+import hu.vuk.belevele.game.struct.Matrix6v;
+import hu.vuk.belevele.ui.Board6vView;
 import hu.vuk.belevele.ui.DrawableService;
 import hu.vuk.belevele.ui.GradientProgressView;
 import hu.vuk.belevele.ui.NextStoneView;
@@ -23,7 +25,7 @@ public class MainActivity extends Activity {
 
   private DrawableService drawableService;
   private NextStoneView nextView;
-  private BoardView boardView;
+  private Board6vView boardView;
   private GradientProgressView levelView;
 
   @Override
@@ -47,7 +49,7 @@ public class MainActivity extends Activity {
         R.color.level_progress_color2,
         R.color.level_progress_color3);
 
-    boardView = (BoardView) findViewById(R.id.boardView);
+    boardView = (Board6vView) findViewById(R.id.boardView);
     boardView.setDrawableService(drawableService);
 
     final TextView scoreText = (TextView) findViewById(R.id.scoreTextView);
@@ -94,7 +96,7 @@ public class MainActivity extends Activity {
 
   private Game createNewGame() {
     return new Game(
-        new Board(BOARD_SIZE, BOARD_SIZE),
+        new Board(new Matrix6v<>(BOARD_SIZE, BOARD_SIZE, Stone.class)),
         new NextStones(NEXT_COUNT, new RandomStoneFactory()));
   }
 }

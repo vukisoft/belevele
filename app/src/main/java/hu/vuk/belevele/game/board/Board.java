@@ -7,7 +7,6 @@ import java.util.Set;
 
 import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Matrix;
-import hu.vuk.belevele.game.struct.Matrix4;
 import hu.vuk.belevele.game.struct.Point;
 
 public class Board {
@@ -17,8 +16,8 @@ public class Board {
   private int score = 0;
   private int multiplier = 1;
 
-  public Board(int width, int height) {
-    matrix = new Matrix4<>(width, height, Stone.class);
+  public Board(Matrix<Stone> matrix) {
+    this.matrix = matrix;
   }
 
   /**
@@ -48,7 +47,7 @@ public class Board {
    * Returns neighbour stones of the place if the given stone can be placed. Null, if the stone can't be placed here.
    */
   private Collection<Stone> getPlacedNeighbours(int x, int y, Stone stone) {
-    if (matrix.isOutOfBounds(x, y)) {
+    if (isOutOfBounds(x, y)) {
       // out of bounds
       return null;
     }
@@ -74,6 +73,10 @@ public class Board {
     }
 
     return neighbours;
+  }
+
+  public boolean isOutOfBounds(int x, int y) {
+    return matrix.isOutOfBounds(x, y);
   }
 
   private boolean isValidPlace(int x, int y, Stone stone) {
