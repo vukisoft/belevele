@@ -2,7 +2,6 @@ package hu.vuk.belevele.ui;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Path;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -26,16 +25,18 @@ public class Board6vView extends BoardView {
     }
     rect.offset((y % 2) * rect.width() / 2, 0);
 
-    float height = (float) (rect.width() / RATIO);
+    Consumer<Rect> hexagonRectTransformation =
+        r -> r.inset(1, (int) ((rect.height() - (rect.width() / RATIO)) / 2) + 1);
 
     Stone stone = game.getBoard().get(x, y);
     if (stone == null) {
-      canvas.drawPath(
-          createHexagonalPath(rect.exactCenterX(), rect.exactCenterY(), height / 2),
-          backgroundTiles.getPaint(x, y));
+      drawableService.draw(R.drawable.bg_hexagon)
+          .withRectTransformation(hexagonRectTransformation)
+          .withColor(backgroundTiles.getColor(x, y))
+          .to(canvas, rect);
     } else {
       drawableService.draw(R.drawable.stone6v)
-          .withRectTransformation(r -> r.inset(1, (int) ((rect.height() - height) / 2) + 1))
+          .withRectTransformation(hexagonRectTransformation)
           .to(canvas, rect);
       drawableService.draw(stone.getShape().resourceId)
           .withColor(stone.getColor().color)
@@ -46,23 +47,6 @@ public class Board6vView extends BoardView {
     }
 
     drawMark(x, y, canvas, rect);
-  }
-
-  private Path createHexagonalPath(float cx, float cy, float r) {
-    Path path = new Path();
-    path.moveTo(angleX(cx, 30, r), angleY(cy, 30, r));
-    for (int i = 90; i <= 390; i+= 60) {
-      path.lineTo(angleX(cx, i, r), angleY(cy, i, r));
-    }
-    return path;
-  }
-
-  private float angleX(float cx, int angle, float r) {
-    return (float) (cx + Math.cos(Math.toRadians(angle)) * r);
-  }
-
-  private float angleY(float cy, int angle, float r) {
-    return (float) (cy + Math.sin(Math.toRadians(angle)) * r);
   }
 
   @Override

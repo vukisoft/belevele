@@ -11,6 +11,7 @@ import hu.vuk.belevele.game.board.NextStones;
 import hu.vuk.belevele.game.stone.Stone;
 import hu.vuk.belevele.game.struct.Matrix6v;
 import hu.vuk.belevele.ui.Board6vView;
+import hu.vuk.belevele.ui.BoardView;
 import hu.vuk.belevele.ui.DrawableService;
 import hu.vuk.belevele.ui.GradientProgressView;
 import hu.vuk.belevele.ui.NextStoneView;
@@ -25,7 +26,7 @@ public class MainActivity extends Activity {
 
   private DrawableService drawableService;
   private NextStoneView nextView;
-  private Board6vView boardView;
+  private BoardView boardView;
   private GradientProgressView levelView;
 
   @Override
@@ -96,7 +97,7 @@ public class MainActivity extends Activity {
 
   private Game createNewGame() {
     return new Game(
-        new Board(new Matrix6v<>(BOARD_SIZE, BOARD_SIZE, Stone.class)),
+        new Board(new Matrix6v<>(BOARD_SIZE, BOARD_SIZE + 1, Stone.class)),
         new NextStones(NEXT_COUNT, new RandomStoneFactory()));
   }
 }

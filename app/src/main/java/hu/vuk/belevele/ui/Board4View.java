@@ -11,10 +11,6 @@ import hu.vuk.belevele.game.struct.Point;
 
 public class Board4View extends BoardView {
 
-  private static final BoardListener NOTHING = (score, multiplier) -> {};
-  private static final float MARK_INSET_RATIO = 0.72f;
-  private static final float SMALL_MARK_INSET_RATIO = 0.86f;
-
   public Board4View(Context context, AttributeSet attrs) {
     super(context, attrs);
   }
